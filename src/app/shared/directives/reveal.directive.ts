@@ -1,20 +1,27 @@
-import { Directive, ElementRef, OnInit, inject, input } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Directive, ElementRef, OnDestroy, OnInit, PLATFORM_ID, inject, input } from '@angular/core';
 import { inView, animate } from 'motion';
 
 @Directive({
   selector: '[appReveal]',
 })
-export class RevealDirective implements OnInit {
+export class RevealDirective implements OnInit, OnDestroy {
   private el = inject(ElementRef);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private stopInView: (() => void) | undefined;
   
   appReveal = input<'fadeUp' | 'fadeRight' | 'fade'>('fadeUp');
   delay = input<number>(0);
   duration = input<number>(0.8);
 
   ngOnInit() {
-    this.el.nativeElement.style.opacity = '0';
+    if (!this.isBrowser) return;
+
+    const element = this.el.nativeElement as HTMLElement;
+
+    element.style.opacity = '0';
     
-    inView(this.el.nativeElement, () => {
+    this.stopInView = inView(element, () => {
       const type = this.appReveal();
       const options = { 
         duration: this.duration(), 
@@ -24,23 +31,27 @@ export class RevealDirective implements OnInit {
       
       if (type === 'fadeUp') {
         animate(
-          this.el.nativeElement,
+          element,
           { opacity: [0, 1], y: [40, 0] },
           options
         );
       } else if (type === 'fadeRight') {
         animate(
-          this.el.nativeElement,
+          element,
           { opacity: [0, 1], x: [-40, 0] },
           options
         );
       } else {
         animate(
-          this.el.nativeElement,
+          element,
           { opacity: [0, 1] },
           options
         );
       }
     }, { amount: 0.1 });
+  }
+
+  ngOnDestroy() {
+    this.stopInView?.();
   }
 }

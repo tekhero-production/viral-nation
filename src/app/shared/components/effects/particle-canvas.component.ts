@@ -1,4 +1,5 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, NgZone, inject, input } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, NgZone, PLATFORM_ID, inject, input } from '@angular/core';
 
 @Component({
   selector: 'app-particle-canvas',
@@ -11,21 +12,27 @@ export class ParticleCanvasComponent implements AfterViewInit, OnDestroy {
   private ctx!: CanvasRenderingContext2D | null;
   private animationFrameId = 0;
   private particles: { x: number; y: number; s: number; sx: number; sy: number; a: number }[] = [];
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly resizeHandler = () => this.resize();
   
   // Use minimal zone interaction to avoid performance hits
   private ngZone = inject(NgZone);
 
   ngAfterViewInit() {
+    if (!this.isBrowser) return;
+
     this.ngZone.runOutsideAngular(() => {
       this.initCanvas();
       this.animate();
-      window.addEventListener('resize', this.resize.bind(this));
+      window.addEventListener('resize', this.resizeHandler);
     });
   }
 
   ngOnDestroy() {
+    if (!this.isBrowser) return;
+
     cancelAnimationFrame(this.animationFrameId);
-    window.removeEventListener('resize', this.resize.bind(this));
+    window.removeEventListener('resize', this.resizeHandler);
   }
 
   private initCanvas() {
