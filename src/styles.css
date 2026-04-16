@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import "tailwindcss";
+
+@theme {
+  --color-black: #020202;
+  --color-zinc-950: #0a0a0a;
+  --color-zinc-900: #121212;
+  
+  --color-gold-300: #e0ca8b;
+  --color-gold-400: #d4af37;
+  --color-gold-500: #c5a059;
+  --color-gold-600: #aa864b;
+
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Outfit", system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-zinc-950 text-zinc-100 font-sans antialiased overflow-x-hidden;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+  }
+  
+  .box-glow {
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
+  }
+  
+  .border-gold-glow {
+    @apply border-gold-500/30 shadow-[0_0_15px_rgba(212,175,55,0.1)];
+  }
+  
+  .bg-surface {
+    @apply bg-zinc-900/80 backdrop-blur-md border border-white/5;
+  }
+}
